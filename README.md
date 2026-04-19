@@ -14,8 +14,8 @@ Key result: religiosity at P_cross=0.001 is approximately 9× higher than at P_c
 
 ## Files
 
-- `Obraztsov_ABM.py` — simulation: ablation study + sensitivity analysis
-- `visualize_results.py` — figures (4 publication-ready plots)
+- `Model_Obraztsov.py` — simulation: ablation study + sensitivity analysis
+- `Visualization_Obraztsov.py` — figures (4 publication-ready plots)
 
 ## How to run
 
@@ -33,4 +33,4 @@ python3 visualize_results.py  # generates figures
 
 ## Reference
 
-Obraztsov, N. A. Network Topology as a Buffer Against Secularization: Structural Mechanisms in Agent-Based Models. Working paper. Accepted for presentation at the 8th European Conference on Social Networks (EUSN 2026), Linköping University, Norrköping, Sweden.
+Obraztsov, N. A. Network Topology as a Buffer Against Secularization: Structural Mechanisms in Agent-Based Models. 
