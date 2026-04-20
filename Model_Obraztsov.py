@@ -206,22 +206,30 @@ def run_batch(
     label: str = "full",
 ) -> pd.DataFrame:
     """
-    Parameter sweep across all p_cross values with n_replications replications.
-    Seeds are derived independently from master_seed via SeedSequence.
+     Parameter sweep across all p_cross values with n_replications replications.
+
+    Seeds are drawn from a pre-generated matrix of shape
+    (len(cross_probs) x n_replications), derived via SeedSequence from
+    master_seed. Each (p_cross, replication) pair receives a unique seed,
+    ensuring that replications are statistically independent both within
+    and across connectivity conditions. The previous approach of offsetting
+    a shared seed pool by int(p_c * 1_000_000) produced unpredictable seed
+    collisions across conditions and is replaced here.
     """
-    seeds = make_seeds(cfg.master_seed, cfg.n_replications)
+    all_seeds = make_seeds(cfg.master_seed, cfg.n_replications * len(cfg.cross_probs))
     results = []
 
-    for p_c in tqdm(cfg.cross_probs, desc=label, leave=False):
+    for p_idx, p_c in enumerate(tqdm(cfg.cross_probs, desc=label, leave=False)):
         reps = []
-        for rep_idx, seed in enumerate(seeds):
+        for rep_idx in range(cfg.n_replications):
+            seed = all_seeds[p_idx * cfg.n_replications + rep_idx]
             df = run_simulation(
                 p_cross=p_c,
                 cfg=cfg,
                 use_deffuant=use_deffuant,
                 use_buffer=use_buffer,
                 social_support_buffer=social_support_buffer,
-                seed=seed + int(p_c * 1_000_000),
+                seed=seed,
             )
             df["rep"] = rep_idx
             reps.append(df)
@@ -247,7 +255,6 @@ def run_batch(
         agg["model"] = label
         agg["buffer_strength"] = social_support_buffer
         results.append(agg)
-
     return pd.concat(results, ignore_index=True)
 
 

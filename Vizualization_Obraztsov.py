@@ -3,7 +3,7 @@
 Figures for "Network Topology as a Buffer Against Secularization."
 Run AFTER Obraztsov_ABM.py has completed.
 
-Nikita Obraztsov | European University at St. Petersburg 
+Nikita Obraztsov | European University at St. Petersburg
 """
 
 from pathlib import Path
@@ -23,6 +23,7 @@ COLORS_6 = ["#1A2F5E", "#1F4788", "#4472C4", "#7BA7D4", "#AACBE8", "#CADCFC"]
 
 
 # --- Load ---
+
 
 def load_ablation():
     ablation = {}
@@ -48,6 +49,7 @@ def load_sensitivity():
 
 # --- Figures ---
 
+
 def make_figures(ablation, sensitivity):
 
     # Fig 1: religiosity trajectories by p_cross (full model)
@@ -60,13 +62,18 @@ def make_figures(ablation, sensitivity):
             sub["Step"],
             sub["Mean_R"] - sub["Mean_R_std"],
             sub["Mean_R"] + sub["Mean_R_std"],
-            color=col, alpha=0.12,
+            color=col,
+            alpha=0.12,
         )
     ax.axvline(INTERVENTION_START, color="gray", lw=1.2, ls="--", alpha=0.7)
-    ax.text(INTERVENTION_START + 3, 0.88, "Modernization\nbegins", fontsize=8, color="gray")
+    ax.text(
+        INTERVENTION_START + 3, 0.88, "Modernization\nbegins", fontsize=8, color="gray"
+    )
     ax.set_xlabel("Simulation Step")
     ax.set_ylabel("Mean Religiosity (Religious Group)")
-    ax.set_title("Figure 1. Religiosity trajectories by cross-group connectivity", fontsize=11)
+    ax.set_title(
+        "Figure 1. Religiosity trajectories by cross-group connectivity", fontsize=11
+    )
     ax.set_ylim(0, 1)
     ax.legend(fontsize=8, frameon=False, ncol=2)
     ax.spines[["top", "right"]].set_visible(False)
@@ -76,8 +83,7 @@ def make_figures(ablation, sensitivity):
 
     # Fig 2: final religiosity vs p_cross — tipping point
     final = (
-        df_full
-        .loc[df_full.groupby("p_cross")["Step"].idxmax()]
+        df_full.loc[df_full.groupby("p_cross")["Step"].idxmax()]
         .copy()
         .sort_values("p_cross")
     )
@@ -86,23 +92,45 @@ def make_figures(ablation, sensitivity):
     bars = ax.bar(
         [str(p) for p in final["p_cross"]],
         final["Mean_R"],
-        color=bar_colors, width=0.6,
+        color=bar_colors,
+        width=0.6,
     )
     ax.errorbar(
-        range(len(final)), final["Mean_R"], yerr=final["Mean_R_std"],
-        fmt="none", color="#333", capsize=4, lw=1.2,
+        range(len(final)),
+        final["Mean_R"],
+        yerr=final["Mean_R_std"],
+        fmt="none",
+        color="#333",
+        capsize=4,
+        lw=1.2,
     )
     for bar, val in zip(bars, final["Mean_R"]):
         ax.text(
-            bar.get_x() + bar.get_width() / 2, val + 0.02, f"{val:.2f}",
-            ha="center", va="bottom", fontsize=9, fontweight="bold", color=NAVY,
+            bar.get_x() + bar.get_width() / 2,
+            val + 0.02,
+            f"{val:.2f}",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            fontweight="bold",
+            color=NAVY,
         )
     ax.axvspan(2.5, 4.5, color="#FFF3E0", alpha=0.55, zorder=0)
-    ax.text(3.5, 0.88, "Tipping point zone\n(0.06 – 0.10)",
-            ha="center", fontsize=8.5, color="#C05010", style="italic")
+    ax.text(
+        3.5,
+        0.88,
+        "Tipping point zone\n(0.06 – 0.10)",
+        ha="center",
+        fontsize=8.5,
+        color="#C05010",
+        style="italic",
+    )
     ax.set_xlabel("Cross-Group Connectivity (P_cross)")
     ax.set_ylabel("Final Mean Religiosity (Step 300)")
-    ax.set_title("Figure 2. Final religiosity as a function of cross-group connectivity", fontsize=11)
+    ax.set_title(
+        "Figure 2. Final religiosity as a function of cross-group connectivity",
+        fontsize=11,
+    )
     ax.set_ylim(0, 1)
     ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()
@@ -119,21 +147,38 @@ def make_figures(ablation, sensitivity):
     most_segregated = all_variants[all_variants["p_cross"] == 0.001].copy()
 
     variant_order = ["reference", "deffuant_only", "buffer_only", "full"]
-    variant_labels = ["Reference\n(ESH only)", "Deffuant\nonly", "Buffer\nonly", "Full\nmodel"]
+    variant_labels = [
+        "Reference\n(ESH only)",
+        "Deffuant\nonly",
+        "Buffer\nonly",
+        "Full\nmodel",
+    ]
     abl_colors = [COLORS_6[5], COLORS_6[3], COLORS_6[1], NAVY]
 
-    vals = [most_segregated.loc[most_segregated["variant"] == v, "Mean_R"].values[0]
-            for v in variant_order]
-    errs = [most_segregated.loc[most_segregated["variant"] == v, "Mean_R_std"].values[0]
-            for v in variant_order]
+    vals = [
+        most_segregated.loc[most_segregated["variant"] == v, "Mean_R"].values[0]
+        for v in variant_order
+    ]
+    errs = [
+        most_segregated.loc[most_segregated["variant"] == v, "Mean_R_std"].values[0]
+        for v in variant_order
+    ]
 
     fig, ax = plt.subplots(figsize=(7, 4))
     bars = ax.barh(variant_labels, vals, color=abl_colors, height=0.5)
-    ax.errorbar(vals, range(len(vals)), xerr=errs,
-                fmt="none", color="#333", capsize=4, lw=1.2)
+    ax.errorbar(
+        vals, range(len(vals)), xerr=errs, fmt="none", color="#333", capsize=4, lw=1.2
+    )
     for bar, val in zip(bars, vals):
-        ax.text(val + 0.01, bar.get_y() + bar.get_height() / 2,
-                f"{val:.2f}", va="center", fontsize=9, fontweight="bold", color=NAVY)
+        ax.text(
+            val + 0.01,
+            bar.get_y() + bar.get_height() / 2,
+            f"{val:.2f}",
+            va="center",
+            fontsize=9,
+            fontweight="bold",
+            color=NAVY,
+        )
     ax.set_xlabel("Final Mean Religiosity (P_cross = 0.001)")
     ax.set_title("Figure 3. Ablation study: mechanism contributions", fontsize=11)
     ax.set_xlim(0, 1)
@@ -148,17 +193,22 @@ def make_figures(ablation, sensitivity):
     sens_styles = ["--", "-", ":"]
     for buf, col, ls in zip(BUFFER_VALUES, sens_colors, sens_styles):
         sub = sensitivity[buf][sensitivity[buf]["p_cross"] == 0.001].sort_values("Step")
-        ax.plot(sub["Step"], sub["Mean_R"], color=col, lw=2, ls=ls, label=f"Buffer = {buf}")
+        ax.plot(
+            sub["Step"], sub["Mean_R"], color=col, lw=2, ls=ls, label=f"Buffer = {buf}"
+        )
         ax.fill_between(
             sub["Step"],
             sub["Mean_R"] - sub["Mean_R_std"],
             sub["Mean_R"] + sub["Mean_R_std"],
-            color=col, alpha=0.1,
+            color=col,
+            alpha=0.1,
         )
     ax.axvline(INTERVENTION_START, color="gray", lw=1, ls="--", alpha=0.6)
     ax.set_xlabel("Simulation Step")
     ax.set_ylabel("Mean Religiosity (Religious Group)")
-    ax.set_title("Figure 4. Sensitivity analysis: buffer strength (P_cross = 0.001)", fontsize=11)
+    ax.set_title(
+        "Figure 4. Sensitivity analysis: buffer strength (P_cross = 0.001)", fontsize=11
+    )
     ax.set_ylim(0, 1)
     ax.legend(fontsize=9, frameon=False)
     ax.spines[["top", "right"]].set_visible(False)
@@ -181,8 +231,7 @@ if __name__ == "__main__":
 
     df_full = ablation["full"]
     final = (
-        df_full
-        .loc[df_full.groupby("p_cross")["Step"].idxmax()]
+        df_full.loc[df_full.groupby("p_cross")["Step"].idxmax()]
         .copy()
         .sort_values("p_cross")
     )
@@ -195,7 +244,11 @@ if __name__ == "__main__":
 
     print("\nAblation (P_cross = 0.001):")
     for key in ["reference", "deffuant_only", "buffer_only", "full"]:
-        row = ablation[key][ablation[key]["p_cross"] == 0.001].sort_values("Step").iloc[-1]
+        row = (
+            ablation[key][ablation[key]["p_cross"] == 0.001]
+            .sort_values("Step")
+            .iloc[-1]
+        )
         print(f"  {key:15s}: R = {row['Mean_R']:.3f} ± {row['Mean_R_std']:.3f}")
 
     print("\nFigures saved to results/")
