@@ -2,8 +2,6 @@
 
 Agent-based model of secularization dynamics under varying network topology.
 
-![cover](ABM_Cover.png)
-
 **Author:** Nikita Obraztsov | European University at St. Petersburg  
 
 ## Overview
